@@ -1,0 +1,46 @@
+#!/usr/bin/python2
+import argparse
+import os
+import logging
+import sys
+
+# take two arguments:
+# 1. option to compile to wat or to asm (default: x86)
+# 2. filename
+argparser = argparse.ArgumentParser(
+  description='Compile python P_0 to x86 assembly or web assembly')
+
+argparser.add_argument('filename', metavar='filename', type=str,
+                        help='the python file to compile')
+argparser.add_argument('--wasm', '-w', action='store_true', help='compile to wasm')
+argparser.add_argument('--x86', '-x', action='store_true', help='compile to x86 asm')
+
+args = argparser.parse_args()
+
+Log_Format = "%(levelname)s %(asctime)s - %(message)s"
+logging.basicConfig(stream=sys.stdout,
+                    filemode="w",
+                    format=Log_Format,
+                    level=logging.INFO)
+
+logger = logging.getLogger()
+
+filename = args.filename
+fname = os.path.splitext(filename)[0]
+if args.wasm:
+  os.system("python2 ./src/pyyc/compile.py --wasm " + filename)
+  if os.path.isfile('wasmlib/pyruntime.wasm') == False:
+    os.system('make -C cruntime clean')
+    logger.info('Compiling WASM runtime...')
+    os.system('make -C cruntime wasm')
+  logger.info('Converting WAT to WASM...')
+  os.system('wat2wasm ' + fname + '.wat' + ' -o ' + fname + '.wasm')
+  os.system('mv ' + fname + '.wasm ' + os.path.dirname(filename) + '/src.wasm')
+if args.x86:
+  os.system("python2 ./src/pyyc/compile.py --x86 " + filename)
+  if os.path.isfile('x86lib/libpyyruntime.a') == False:
+    os.system('make -C cruntime clean')
+    logger.info('Compiling x86 runtime...')
+    os.system('make -C cruntime x86')
+  logger.info('Linking x86 runtime...')
+  os.system('gcc -m32 -g %s.s x86lib/libpyyruntime.a -lm -o %s' % (fname, fname))

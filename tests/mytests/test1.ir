@@ -1,0 +1,54 @@
+main:
+pushl $1
+call inject_int
+addl $4, %esp
+movl %eax, tmp_30_9
+movl tmp_30_9, tmp_30_5
+pushl $2
+call inject_int
+addl $4, %esp
+movl %eax, tmp_30_11
+movl tmp_30_11, tmp_30_6
+pushl $3
+call inject_int
+addl $4, %esp
+movl %eax, tmp_30_13
+movl tmp_30_13, tmp_30_7
+movl $3, %eax
+shl $2, %eax
+pushl %eax
+call create_list
+addl $4, %esp
+orl $3, %eax
+movl %eax, tmp_30_15
+pushl tmp_30_5
+movl $0, %eax
+shl $2, %eax
+pushl %eax
+pushl tmp_30_15
+call set_subscript
+addl $12, %esp
+pushl tmp_30_6
+movl $1, %eax
+shl $2, %eax
+pushl %eax
+pushl tmp_30_15
+call set_subscript
+addl $12, %esp
+pushl tmp_30_7
+movl $2, %eax
+shl $2, %eax
+pushl %eax
+pushl tmp_30_15
+call set_subscript
+addl $12, %esp
+movl tmp_30_15, %eax
+movl %eax, tmp_30_16
+movl tmp_30_16, tmp_30_8
+movl tmp_30_8, tmp_30_18
+movl tmp_30_18, x_0
+movl x_0, %eax
+pushl %eax
+call print_any
+addl $4, %esp
+movl $0, %eax
